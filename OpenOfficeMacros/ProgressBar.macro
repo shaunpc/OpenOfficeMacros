@@ -1,0 +1,58 @@
+REM  *****  BASIC  *****
+
+REM 
+REM	OpenOffice Macro : Insert OpenOffice Impress Progress Bar to show progress through presentation
+REM
+REM The DOCUMENT 
+REM ...  contains DRAWPAGES (i.e. Slides)
+REM ...  contains OBJECTS (i.e. Shapes)
+REM
+
+Sub InsertProgressBar
+
+
+    Dim oDoc As Object ' com.sun.star.lang.XComponent
+    Dim oSlide As Object ' com.sun.star.drawing.XDrawPage
+    Dim oProgressBar As Object ' com.sun.star.drawing.RectangleShape
+    Dim oSize As New com.sun.star.awt.Size
+    Dim oPosition As New com.sun.star.awt.Point
+
+    
+	oDoc = ThisComponent
+	
+
+	' Start from 1 as don't want the title page
+	numSlides = oDoc.getDrawPages.getCount() -1 
+	For X = 1 To numSlides
+
+		oSlide = oDoc.getDrawPages.getByIndex(X)
+		    
+	    ' Remove the old ProgressBar item if found
+	    For Y = 0 to oSlide.getCount() - 1
+	    	oItem = oSlide.getByIndex(Y)
+	    	If oItem.Name = "ProgressBar" Then 
+	    		oSlide.remove(oItem)
+	    		Exit For
+	    	EndIf
+	    Next Y
+
+		oPosition.X = 0  'onleft hand side
+		oPosition.Y = oSlide.Height - 200  '5mmm from bottom
+		oSize.Width = oSlide.Width * ( X / numSlides )
+		oSize.Height = 100 ' 1mm
+		oProgressBar = oDoc.createInstance("com.sun.star.drawing.RectangleShape")
+		oProgressBar.Size = oSize
+		oProgressBar.Position = oPosition
+   		oProgressBar.FillColor = RGB(0, 100, 255) ' BLUE
+        oProgressBar.FillStyle = com.sun.star.drawing.FillStyle.SOLID ' or .NONE
+        oProgressBar.FillTransparence = 30 ' 0-100 from opaque to transparent
+   		oProgressBar.LineStyle = com.sun.star.drawing.LineStyle.NONE ' or .SOLID
+        oProgressBar.LineWidth = 000 ' 0 mm
+        oProgressBar.LineColor = RGB(0, 0, 0) ' BLACK
+        oProgressBar.CornerRadius = 50
+        oProgressBar.setName("ProgressBar")
+		oSlide.add(oProgressBar)
+		
+	Next X
+	
+End Sub
